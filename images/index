@@ -1,0 +1,146 @@
+<?php
+include 'header.php';
+?>
+<div id="main-content">
+  <h2>All Records</h2>
+  <?php
+  include 'config.php';
+  // "SELECT * FROM student JOIN studentclass WHERE student.sclass = studentclass.cid"
+  $sql = "SELECT * FROM student JOIN studentclass WHERE student.sclass = studentclass.cid";
+  $result = mysqli_query($conn, $sql) or die("Query Unsuccessful.");
+
+  if (mysqli_num_rows($result) > 0) {
+
+
+  ?>
+    <table cellpadding="7px">
+      <thead>
+        <th>Id</th>
+        <th>Name</th>
+        <th>DOB</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Class</th>
+        <th>Created</th>
+        <th>Action</th>
+      </thead>
+      <tbody>
+        <?php
+        while ($row = mysqli_fetch_assoc($result)) {
+          $var=$row['sid'];
+        
+        ?>
+          <tr>
+            <td><?php echo $row['sid']; ?></td>
+            <td><?php echo $row['sname']; ?></td>
+            <td><?php echo $row['sdob']; ?></td>
+            <td><?php echo $row['sphone']; ?></td>
+            <td><?php echo $row['semail']; ?></td>
+            <td><?php echo $row['cname']; ?></td>
+            <td><?php echo $row['sdate']; ?></td>
+            
+            <td>
+              <a href="" data-toggle="modal" data-target="#exampleModal">View</a>
+              <a href='edit.php?id=<?php echo $row['sid'] ?>'>Edit</a>
+              <a href='delete-inline.php?id=<?php echo $row['sid'] ?>'>Delete</a>
+             
+            </td>
+            
+          </tr>
+        <?php } ?>
+      </tbody>
+    </table>
+  <?php } else {
+    echo "<h2>No Record Found</h2>";
+  }
+  mysqli_close($conn);
+  ?>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">View Record</h5>
+                      
+                    <!--  --><button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <div id="main-content">
+                        
+
+                        <?php
+                        $conn = mysqli_connect("localhost", "root", "", "crud") or die("Connection Failed");
+
+                        $stu_id = $var;
+
+                        $sql = "SELECT * FROM student WHERE sid = {$stu_id}";
+                        $result = mysqli_query($conn, $sql) or die("Query Unsuccessful.");
+
+                        if (mysqli_num_rows($result) > 0) {
+                          while ($row = mysqli_fetch_assoc($result)) {
+                        ?>
+                            <form class="post-form" action="index.php" method="post">
+                              <div class="form-group">
+                                <label>Name</label>
+                                <input type="hidden" name="sid" value="<?php echo $row['sid']; ?>" />
+                                <input type="text" name="sname" value="<?php echo $row['sname']; ?>" disabled />
+                              </div>
+                              <div class="form-group">
+                                <label>DOB</label>
+                                <input type="date" name="sdob" value="<?php echo $row['sdob']; ?>" disabled />
+                              </div>
+                              <div class="form-group">
+                                <label>Phone</label>
+                                <input type="text" name="sphone" value="<?php echo $row['sphone']; ?>" disabled />
+                              </div>
+                              <div class="form-group">
+                              <label for="email">Email</label>
+                                <input type="email" name="semail" value="<?php echo $row['semail']; ?>" disabled />
+                              </div>
+                              <div class="form-group">
+                                <label>Class</label>
+                                <?php
+                                $sql1 = "SELECT * FROM studentclass";
+                                $result1 = mysqli_query($conn, $sql1) or die("Query Unsuccessful.");
+
+                                if (mysqli_num_rows($result1) > 0) {
+                                  echo '<select name="sclass" disabled>';
+                                  while ($row1 = mysqli_fetch_assoc($result1)) {
+
+                                    if ($row['sclass'] == $row1['cid']) {
+                                      $select = "selected";
+                                    } else {
+                                      $select = "";
+                                    }
+
+                                    echo "<option {$select} value='{$row1['cid']}'>{$row1['cname']}</option>";
+                                  }
+                                  echo "</select>";
+                                }
+                                ?>
+                              </div>
+                              <div class="form-group">
+                                <label>Created</label>
+                                <input type="date" name="sdate" value="<?php echo $row['sdate']; ?>" disabled />
+                              </div>
+
+                            </form>
+                        <?php
+
+                          }
+                        }
+                        ?>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+</div>
+</body>
+
+
+</html>
